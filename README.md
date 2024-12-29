@@ -7,7 +7,7 @@
 from project source foulder, run:
 
 ```
-cd voyantis
+cd client/voyantis
 npm install
 npm run dev
 ```
