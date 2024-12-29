@@ -24,4 +24,7 @@ python3 app.py
 
 ## Running:
 
-In the web browser, navigate to http:\\localhist:5173
+In the web browser, navigate to 
+```
+http:\\localhost:5173
+```
