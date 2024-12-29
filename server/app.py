@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from contextlib import asynccontextmanager
 
+msg_queues = {}
+
 @asynccontextmanager
 async def lifespan(app:FastAPI):
     #  create_db_and_tables(engine)
