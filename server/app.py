@@ -3,17 +3,18 @@ from fastapi import FastAPI,HTTPException,Query,Depends
 from pydantic import BaseModel
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Annotated
+from typing import Annotated,List,Tuple
 from contextlib import asynccontextmanager
 import asyncio
-msg_queues = {}
+msg_queues = {
+          'chats_with_mom':['a','b','c','d'],
+          'chats_with_dad':['a','b','e'],
+          'chats_with_friend':['hello','world']
+     }
 class Message(BaseModel):
        msg: str
-@asynccontextmanager
-async def lifespan(app:FastAPI):
-     yield
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 allowed_origins=['http://localhost:5173']
 app.add_middleware(CORSMiddleware,
                    allow_origins=allowed_origins,
@@ -51,7 +52,13 @@ async def add_message_to_queue(queue_name:str,message:Message)->dict[str,str|int
         except Exception as e:
             raise HTTPException(status_code=500, detail=f'error occured -{e}')
     
-
+@app.get('/api/all_queues/fetchall')
+async def fetch_all_queues()->List[Tuple[str,int]]:
+     print(msg_queues)
+     try:
+        return [(k,len(v)) for k,v in msg_queues.items()]
+     except Exception as e:
+        raise HTTPException(status_code=500, detail=f'error occured -{e}')
 
 if(__name__) == '__main__':
         uvicorn.run(
