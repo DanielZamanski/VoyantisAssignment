@@ -27,12 +27,9 @@ async def fetch_message_queue_by_name(queue_name:str,ms:int=10)->dict[str,str|in
     try:
         # Validate if the queue exists
         if not msg_queues.__contains__(queue_name):
-            raise HTTPException(status_code=404, detail="Queue not found")
-
-        
+            raise HTTPException(status_code=404, detail="Queue not found") 
         elapsed_time = 0.0
         interval = 0.1  
-
         while elapsed_time < ms:
             if msg_queues[queue_name]: 
                 message_to_return = msg_queues[queue_name].pop(0)
