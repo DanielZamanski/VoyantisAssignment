@@ -7,10 +7,10 @@ from typing import Annotated
 from contextlib import asynccontextmanager
 
 msg_queues = {}
-
+class Message(BaseModel):
+       msg: str
 @asynccontextmanager
 async def lifespan(app:FastAPI):
-    #  create_db_and_tables(engine)
      yield
 
 app = FastAPI(lifespan=lifespan)
@@ -22,15 +22,24 @@ app.add_middleware(CORSMiddleware,
                     allow_headers=["*"], )    
 
 
-@app.get('/api/{queue_name}?timout={ms}')
-def fetch_message_queue_by_name(queue_name:str,ms:int=10)->dict[str,str|int]:
-       print(queue_name,ms)
-       return {"status":200,"message":"Message"}
+@app.get('/api/{queue_name}')
+async def fetch_message_queue_by_name(queue_name:str,ms:int=10)->dict[str,str|int]:
+        try:
+            message_to_return = msg_queues[queue_name][0]
+            msg_queues[queue_name] = msg_queues[queue_name][1:]
+            return {"status":200,"message":message_to_return}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f'error occured -{e}')
 
 @app.post('/api/{queue_name}')
-def add_message_to_queue(queue_name:str,msg:str)->dict[str,str|int]:
-        print(queue_name,msg)
-        return {"status":200,"message":"Message"}
+async def add_message_to_queue(queue_name:str,message:Message)->dict[str,str|int]:
+        try:
+            msg_queues[queue_name] = msg_queues.get(queue_name,[])+[message.msg]
+            print(msg_queues)
+            return {"status":200,"message":"message added successfully"}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f'error occured -{e}')
+    
 
 
 if(__name__) == '__main__':
